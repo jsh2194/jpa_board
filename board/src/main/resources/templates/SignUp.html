@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Board Test</title>
+
+
+<link rel="stylesheet" href="/webjars/bootstrap/4.1.3/css/bootstrap.min.css">
+
+
+<script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+<script>
+
+
+function saveUser(){
+
+	var queryString = $("form[name=frmBoard]").serialize() ;
+	 
+    $.ajax({
+        type : 'post',
+        url : '/addUser',
+        data : queryString,
+        dataType : 'json',
+        success : function(data){
+            alert(data);
+            JSON.stringify(data);
+            console.log("AAAAAAAAAAAA");
+            console.log(data);
+            
+            if(data.result == 'Y'){
+            	alert("회원가입성공");
+            }else if(data.result == 'N'){
+            	alert("회원가입실패");
+            	
+            }
+        },
+    });
+
+}
+
+
+</script>
+
+</head>
+<body>
+<form id="frmBoard" name="frmBoard" method="post" >
+		<h2>TEST_BOARD</h2>
+      
+      <table class="">
+      	<tr>
+      		<td>회원가입 페이지 입니다.</td>
+      	</tr>
+      </table>
+      <div>
+      	<table board="1">
+      		<tr>
+      			<td>아이디</td>
+      			<td>
+      				<input type="text" id="USER_ID" name="USER_ID" maxlength="100" value="">
+      			</td>
+      		</tr>
+      		<tr>
+      			<td>성명</td>
+      			<td>
+      				<input type="text" id="USER_NAME" name="USER_NAME" maxlength="100" value="">
+      			</td>
+      		</tr>
+      		<tr>
+      			<td>비밀번호</td>
+      			<td>
+      				<input type="password" id="PWD" name="PWD" maxlength="100" value="">
+      			</td>
+      		</tr>
+      		<tr>
+      			<td>비밀번호 확인</td>
+      			<td>
+      				<input type="password" id="PWD_CHK" name="PWD_CHK" maxlength="100" value="">
+      			</td>
+      		</tr>
+      	</table>
+      
+      	<input type="button" id="btn1" name="btn1" value="등록" onclick="javascript:saveUser()">
+      	<input type="button" id="btn2" name="btn2" value="취소" onclick="javascript:cancle()">
+      </div>
+      
+</form>
+</body>
+</html>
