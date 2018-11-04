@@ -14,8 +14,8 @@ import lombok.Data;
 
 
 @Data
-@Entity
-public class Board {
+@Entity(name="BOARD")
+public class BoardEntity {
 	
 	@Id
 	@GeneratedValue(strategy= GenerationType.AUTO)
