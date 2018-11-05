@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Board Test</title>
+
+
+<link rel="stylesheet" href="/webjars/bootstrap/4.1.3/css/bootstrap.min.css">
+
+
+<script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+<script>
+
+
+function saveWrite(){
+
+	var queryString = $("form[name=frmBoard]").serialize() ;
+	 
+    $.ajax({
+        type : 'post',
+        url : '/saveWrite',
+        data : queryString,
+        dataType : 'json',
+        success : function(data){
+            JSON.stringify(data);
+            
+            if(data.result == 'Y'){
+            	alert("글작성완료");
+
+//            	window.location.href = "/BoardList?no="+data.no;
+            	window.location.href = "/BoardList";
+
+            }else if(data.result == 'N'){
+            	alert("글작성 실패");
+            	
+            }
+        },
+    });
+
+}
+
+</script>
+
+</head>
+<body>
+<form id="frmBoard" name="frmBoard" method="post" >
+		<h2>TEST_BOARD</h2>
+		
+		<table class="">
+      	<tr>
+      		<td>게시판글쓰기</td>
+      	</tr>
+      </table>
+		
+      
+      <table border="1px">
+      	<tr>
+   			<td>제목</td>
+   			<td>
+   				<input type="text" id="title" name="title" maxlength="200" th:value="${boardInfo?.title}">
+   			</td>
+   		</tr>
+      	<tr>
+   			<td>내용</td>
+   			<td>
+   				<!-- <textarea th:field="*{contents}"  rows="5">contents</textarea> -->
+   				<textarea id="contents" name="contents"  rows="5">contents</textarea>
+   			</td>
+   		</tr>
+      	<tr>
+   			<td>작성자</td>
+   			<td>
+   				<input type="text" id="writeId" name="writeId" maxlength="100" th:value="${userInfo?.userId}">
+   			</td>
+   		</tr>
+      </table>
+      
+      <input type="button" id="btn1" name="btn1" value="등록" onclick="javascript:saveWrite()">
+      세션아이디 : <p th:text="${session.sessionId}">아이디</p>
+</form>
+</body>
+</html>

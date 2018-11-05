@@ -27,15 +27,13 @@ function saveUser(){
         data : queryString,
         dataType : 'json',
         success : function(data){
+            alert(data);
             JSON.stringify(data);
             console.log("AAAAAAAAAAAA");
             console.log(data);
             
             if(data.result == 'Y'){
             	alert("회원가입성공");
-
-            	window.location.href = "/userInfo?userId="+data.userId;
-
             }else if(data.result == 'N'){
             	alert("회원가입실패");
             	
@@ -63,25 +61,25 @@ function saveUser(){
       		<tr>
       			<td>아이디</td>
       			<td>
-      				<input type="text" id="userId" name="userId" maxlength="100" th:value="${userInfo?.userId}">
+      				<input type="text" id="USER_ID" name="USER_ID" maxlength="100" value="">
       			</td>
       		</tr>
       		<tr>
       			<td>성명</td>
       			<td>
-      				<input type="text" id="userName" name="userName" maxlength="100" th:value="${userInfo?.userName}">
+      				<input type="text" id="USER_NAME" name="USER_NAME" maxlength="100" value="">
       			</td>
       		</tr>
       		<tr>
       			<td>비밀번호</td>
       			<td>
-      				<input type="password" id="pwd" name="pwd" maxlength="100" value="">
+      				<input type="password" id="PWD" name="PWD" maxlength="100" value="">
       			</td>
       		</tr>
       		<tr>
       			<td>비밀번호 확인</td>
       			<td>
-      				<input type="password" id="pwdChk" name="pwdChk" maxlength="100" value="">
+      				<input type="password" id="PWD_CHK" name="PWD_CHK" maxlength="100" value="">
       			</td>
       		</tr>
       	</table>

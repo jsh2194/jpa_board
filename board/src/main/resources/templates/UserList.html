@@ -39,38 +39,62 @@ function callAdd(){
 
 }
 
-
-function SignUp(){
-
-		location.replace("/SignUp");
-
-}
-
-//게시판이동
-function BoardList(){
-
-		window.location.href = "/BoardList";
-
-}
-
 </script>
 
 </head>
 <body>
 <form id="frmBoard" name="frmBoard" method="post" >
 		<h2>TEST_BOARD</h2>
-      
+		
+		<table class="">
+      	<tr>
+      		<td>회원정보</td>
+      	</tr>
+      </table>
+		
+      <!-- 
       <table class="">
       	<tr>
-      		<td>테스트게시판입니다.</td>
+      		<td>123123</td>
       	</tr>
       </table>
       <div>
-      	<input type="button" id="btn" name="btn" value="회원가입" onclick="javascript:SignUp()">
-      	<input type="button" id="btn" name="btn" value="로그인" onclick="javascript:Login()">
-      	<input type="button" id="btn" name="btn" value="게시판이동" onclick="javascript:BoardList()">
+      	<input type="button" id="btn" name="btn" value="유저 생성" onclick="javascript:callAdd()">
       </div>
       
+      <table border="1px" >
+      	<tr>
+      		<td>
+      			가나다라
+      		</td>
+      	</tr>
+      	<tr>
+      		<td>
+      			아아아아
+      		</td>
+      	</tr>
+      </table>
+       -->
+      
+      <table border="1px">
+      	<tr>
+      		<td>순번</td>
+      		<td>ID</td>
+      		<td>성명</td>
+      		<td>등록일시</td>
+      		<td>사용여부</td>
+      	</tr>
+      	<tbody>
+	     <tr th:each="user : ${userInfoList}">
+	         <td th:text="${user.no}" align="center">NO</td>    
+	         <td th:text="${user.userId}" align="center">ID</td>
+	         <td th:text="${user.userName}" align="center">성명</td>
+	         <td th:text="${#temporals.format(user.writeDate, 'yyyy-MM-dd')}" align="center">등록일시</td>
+	         <td th:text="${user.useYn}" align="center">사용여부</td>
+	     </tr>
+	     </tbody>
+      </table>
+      <!-- 세션아이디 : <p th:text="${session.sessionId}">아이디</p> -->
 </form>
 </body>
 </html>
