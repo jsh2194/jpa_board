@@ -3,11 +3,17 @@ package com.board.test.entity;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Parent;
 
 import lombok.Data;
 
@@ -44,6 +50,26 @@ public class BoardEntity {
 	
 	@NotNull
 	private long viewCnt;						//뷰카운트
+	
+	
+	
+//	@OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+//	@JoinColumn(name="userId")
+//	private Collection<UserInfoEntity> userInfoEntity;
+	
+	
+//	@ManyToOne(targetEntity=UserInfoEntity.class, fetch=FetchType.LAZY)
+//	@JoinColumn(name="userId")
+//	private UserInfoEntity userInfoEntity;
+	
+	
+//	@ManyToOne(optional = false)
+//	@JoinTable(name = "userInfo",
+//    joinColumns = @JoinColumn(name = "writeId"),
+//    inverseJoinColumns = @JoinColumn(name = "userId"))
+//	private UserInfoEntity userInfoEntity;
+	
+	
 	
 	
 }

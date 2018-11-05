@@ -70,8 +70,12 @@ function BoardWrite(){
       	<tbody>
 	     <tr th:if="${boardList.size() > 0}"   th:each="board : ${boardList}">
 	         <td th:text="${board.no}" align="center">NO</td>    
-	         <td th:text="${board.title}" align="center">제목</td>
+	         <!-- <td th:text="${board.title}" align="center">제목</td> -->
+	         <td>
+	         	<a th:href="@{'/BoardDetail/' + ${board.no}}"><span th:text="${board.title}">제목</span></a>
+	         </td>
 	         <td th:text="${board.writeId}" align="center">성명</td>
+	         <!-- <td th:text="${board.userInfoEntity.userName}" align="center">성명</td> -->
 	         <td th:text="${#temporals.format(board.writeDate, 'yyyy-MM-dd')}" align="center">등록일시</td>
 <!-- 	         <td th:text="${board.USE_YN}" align="center">사용여부</td> -->
 	     </tr>

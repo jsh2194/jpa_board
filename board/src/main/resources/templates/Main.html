@@ -42,7 +42,13 @@ function callAdd(){
 
 function SignUp(){
 
-		location.replace("/SignUp");
+		window.location.href = "/SignUp";
+
+}
+
+function LoginForm(){
+
+		window.location.href = "/LoginForm";
 
 }
 
@@ -67,7 +73,7 @@ function BoardList(){
       </table>
       <div>
       	<input type="button" id="btn" name="btn" value="회원가입" onclick="javascript:SignUp()">
-      	<input type="button" id="btn" name="btn" value="로그인" onclick="javascript:Login()">
+      	<input type="button" id="btn" name="btn" value="로그인" onclick="javascript:LoginForm()">
       	<input type="button" id="btn" name="btn" value="게시판이동" onclick="javascript:BoardList()">
       </div>
       

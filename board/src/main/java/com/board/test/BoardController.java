@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,6 +67,67 @@ public class BoardController {
 	}
 	
 	
+	//로그인페이지 이동
+	@RequestMapping(value={"/LoginForm"}, method=RequestMethod.GET)
+	public ModelAndView getLoginForm(HttpServletRequest req, HttpServletResponse resp) {
+
+		ModelAndView modelAndView = new ModelAndView();
+
+		//세션정보가 있다면
+		if(req.getSession().getAttribute("sessionId") != null || !String.valueOf(req.getSession().getAttribute("sessionId")).equals("")) {
+			
+			modelAndView.setViewName("LoginForm.html");
+		}else {
+			
+			List<BoardEntity> boardList =  boardEntityJpaRepository.findAll();
+			
+			
+			modelAndView.addObject("boardList", boardList);
+			modelAndView.setViewName("BoardList.html");
+			
+		}
+		
+		
+		
+		return modelAndView;
+	}
+	
+	
+
+
+	@RequestMapping("/SignIn")
+	@ResponseBody 
+	public Map<String, Object> SignIn(HttpServletRequest req, HttpServletResponse resp, UserInfoEntity  userInfoParam) {
+		
+		System.out.println("/SignIn  start");
+		
+		Map<String, Object> mv = new HashMap<String, Object>();
+		
+		UserInfoEntity userInfo = userInfoEntityJpaRepository.findByUserIdAndPwd(String.valueOf(userInfoParam.getUserId()), String.valueOf(userInfoParam.getPwd()));
+		
+		
+		
+		
+		if(ObjectUtils.isEmpty(userInfo)){
+			System.out.println("userInfo null");
+			mv.put("result", "N");
+		}else {
+			System.out.println("userInfo not null");
+			
+			mv.put("result", "Y");
+			mv.put("userId", userInfo.getUserId());
+			mv.put("userName", userInfo.getUserName());
+			
+			req.getSession().setAttribute("sessionId", String.valueOf(userInfo.getUserId()));
+		}
+		
+		
+		return  mv;
+		
+		
+		
+	}
+		
 
 
 	@RequestMapping("/hello")
@@ -269,6 +331,34 @@ public class BoardController {
 		}
 		
 		
+		//게시판 글쓰기
+		@RequestMapping("/BoardDetail")
+		public String BoardDetail(HttpServletRequest req, HttpServletResponse resp, Model model, @RequestParam Map<String, Object> mapParam) {
+			
+			mapParam.get("no");
+			
+			List<BoardEntity> boardList =  boardEntityJpaRepository.findAll();
+			
+			System.out.println("sesseion id  :  " + req.getSession().getAttribute("sessionId"));
+			
+			UserInfoEntity userInfo = userInfoEntityJpaRepository.findByUserId(String.valueOf(req.getSession().getAttribute("sessionId")));
+			
+			
+			model.addAttribute("boardList", boardList);
+			model.addAttribute("userInfo", userInfo);
+			
+			System.out.println("userInfo " + userInfo);
+			System.out.println("boardList " + boardList.size());
+			
+			return  "BoardWrite";
+			
+			
+			
+		}
+		
+		
+		
+		
 		@RequestMapping("/addUser11")
 		public String addUser11(Model model) {
 			
@@ -319,32 +409,39 @@ public class BoardController {
 			
 			try {
 				
+				UserInfoEntity inserData = new UserInfoEntity();
+				
 				LocalDateTime date = LocalDateTime.now();
 				
-				userInfo.setUserId(String.valueOf(userInfo.getUserId()));
+				inserData.setUserId(String.valueOf(userInfo.getUserId()));
 				
-				userInfo.setUserName(String.valueOf(userInfo.getUserName()));
+				inserData.setUserName(String.valueOf(userInfo.getUserName()));
 				
-				userInfo.setPwd(String.valueOf(userInfo.getPwd()));
+				inserData.setPwd(String.valueOf(userInfo.getPwd()));
 				
-				userInfo.setWriteId(String.valueOf(userInfo.getUserId()));
+				inserData.setWriteId(String.valueOf(userInfo.getUserId()));
 				
-				userInfo.setWriteDate(date);
+				inserData.setWriteDate(date);
 				
-				userInfo.setUseYn("Y");
+				inserData.setUseYn("Y");
 				
-				UserInfoEntity userInfoData = userInfoEntityJpaRepository.save(userInfo);
+				System.out.println("inserData  : " + inserData.toString());
+				
+				UserInfoEntity userInfoData = userInfoEntityJpaRepository.save(inserData);
 				
 				System.out.println("@@@@@@@@  : " + userInfoData.toString());
 				
 	//			mv.addObject("result", "Y");
 				mv.put("result", "Y");
-				mv.put("no", userInfoData.getNo());
-				mv.put("userId", userInfoData.getUserId());
+				mv.put("no", inserData.getNo());
+				mv.put("userId", inserData.getUserId());
 				
-				req.getSession().setAttribute("sessionId", String.valueOf(userInfo.getUserId()));
+				req.getSession().setAttribute("sessionId", String.valueOf(inserData.getUserId()));
 				
 			}catch (Exception e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				
 				mv.put("result", "N");
 				req.getSession().setAttribute("sessionId", "");
 			}

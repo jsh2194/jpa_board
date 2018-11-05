@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Board Test</title>
+
+
+<link rel="stylesheet" href="/webjars/bootstrap/4.1.3/css/bootstrap.min.css">
+
+
+<script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+<script>
+
+
+
+//회원가입
+function SignUp(){
+
+	location.replace("/SignUp");
+
+}
+
+//로그인
+function SignIn(){
+
+	var queryString = $("form[name=frmBoard]").serialize() ;
+	 
+    $.ajax({
+        type : 'post',
+        url : '/SignIn',
+        data : queryString,
+        dataType : 'json',
+        success : function(data){
+            JSON.stringify(data);
+            console.log(data);
+            
+            if(data.result == 'Y'){
+            	alert("로그인 성공");
+
+            	window.location.href = "/BoardList";
+
+            }else if(data.result == 'N'){
+            	alert("로그인 실패");
+            	$("#pwd").val("");
+            	
+            }
+        },
+    });
+
+
+}
+
+
+</script>
+
+</head>
+<body>
+<form id="frmBoard" name="frmBoard" method="post" >
+		<h2>TEST_BOARD</h2>
+      
+      <table class="">
+      	<tr>
+      		<td>로그인</td>
+      	</tr>
+      </table>
+      <div>
+      	<table board="1">
+      		<tr>
+      			<td>아이디</td>
+      			<td>
+      				<input type="text" id="userId" name="userId" maxlength="100" value="">
+      			</td>
+      		</tr>
+      		<tr>
+      			<td>비밀번호</td>
+      			<td>
+      				<input type="password" id="pwd" name="pwd" maxlength="100" value="">
+      			</td>
+      		</tr>
+      	</table>
+      
+      	<input type="button" id="btn1" name="btn1" value="로그인" onclick="javascript:SignIn()">
+      	<input type="button" id="btn2" name="btn2" value="회원가입" onclick="javascript:SignUp()">
+      </div>
+      
+</form>
+</body>
+</html>
