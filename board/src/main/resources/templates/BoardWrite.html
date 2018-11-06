@@ -14,11 +14,14 @@
 <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
 <script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-<script>
+<script type="text/javascript" th:inline="javascript">
 
 
 function saveWrite(){
-
+	
+	/* <![CDATA[ */
+		
+		alert("1111");
 	var queryString = $("form[name=frmBoard]").serialize() ;
 	 
     $.ajax({
@@ -41,7 +44,50 @@ function saveWrite(){
             }
         },
     });
+    /* ]]> */
+}
 
+
+function saveUpdate(){
+	/* <![CDATA[ */ 
+
+	var boardUuid = /*[[ ${boardInfo?.boardUuid} ]]*/
+	var queryString = $("form[name=frmBoard]").serialize() ;
+	
+	queryString += '&boardUuid=' + boardUuid;
+
+	//queryString.push({name:'boardUuid', value:boardUuid});
+	 
+	//var paramData = {"boardUuid" : boardUuid }
+	
+	alert(boardUuid);
+	//alert(JSON.stringify(paramData));
+	
+	
+    $.ajax({
+        type : 'post',
+        url : '/saveUpdate',
+        data : queryString,
+        //data : JSON.stringify(paramData),
+        dataType : 'json',
+        success : function(data){
+            JSON.stringify(data);
+            
+            if(data.result == 'Y'){
+            	alert("수정완료");
+
+//            	window.location.href = "/BoardList?no="+data.no;
+            	window.location.href = "/BoardList";
+
+            }else if(data.result == 'N'){
+            	alert("수정 실패");
+            	
+            }
+        },
+    });
+
+	/* ]]> */
+	
 }
 
 </script>
@@ -49,6 +95,8 @@ function saveWrite(){
 </head>
 <body>
 <form id="frmBoard" name="frmBoard" method="post" >
+<!-- <input type="text" id="boardUuid" name="boardUuid" th:value="${boardInfo?.boardUuid}"> -->
+
 		<h2>TEST_BOARD</h2>
 		
 		<table class="">
@@ -69,19 +117,26 @@ function saveWrite(){
    			<td>내용</td>
    			<td>
    				<!-- <textarea th:field="*{contents}"  rows="5">contents</textarea> -->
-   				<textarea id="contents" name="contents"  rows="5">contents</textarea>
+   				<textarea id="contents" name="contents"  rows="5" th:text="${boardInfo?.contents}">contents</textarea>
    			</td>
    		</tr>
       	<tr>
    			<td>작성자</td>
    			<td>
-   				<input type="text" id="writeId" name="writeId" maxlength="100" th:value="${userInfo?.userId}">
+   				<input th:if="${detailView.equals('Y')}" type="text" id="userName" name="userName" maxlength="100" th:value="${boardInfo.userInfo.userName}" readOnly="readOnly">
+   				<input th:unless="${detailView.equals('Y')}" type="text" id="userName" name="userName" maxlength="100" th:value="${userInfo?.userName}" readOnly="readOnly">
    			</td>
    		</tr>
       </table>
       
-      <input type="button" id="btn1" name="btn1" value="등록" onclick="javascript:saveWrite()">
-      세션아이디 : <p th:text="${session.sessionId}">아이디</p>
+      <input th:if="${boardInfo?.userInfo?.userUuid?.equals(session?.sessionId)}" type="button" id="btn1" name="btn1" value="수정" onclick="javascript:saveUpdate()">
+      <input th:if="${boardInfo?.userInfo?.userUuid?.equals(session?.sessionId)}" type="button" id="btn1" name="btn1" value="삭제" onclick="javascript:saveDelete()">
+      
+      <input th:unless="${session?.sessionId.equals('')}" type="button" id="btn" name="btn" value="글작성" onclick="javascript:saveWrite()">
+      
+      <!-- <input type="button" id="btn" name="btn" value="글작성" onclick="javascript:BoardWrite()"> -->
+      
+      세션아이디 : <p th:text="${session?.sessionId}">아이디</p>
 </form>
 </body>
 </html>

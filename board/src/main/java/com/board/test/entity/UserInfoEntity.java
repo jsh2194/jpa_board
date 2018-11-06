@@ -1,6 +1,7 @@
 package com.board.test.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,11 +17,17 @@ import lombok.Data;
 @Entity(name="userInfo")
 public class UserInfoEntity {
 	
-	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	private long no;							//순번
+//	@Id
+//	@GeneratedValue(strategy= GenerationType.AUTO)
+//	private long no;							//순번
 	
 
+	@Id
+	@NotNull
+//	private String user_uuid;						//unique id
+	private String userUuid = String.valueOf(UUID.randomUUID());							//순번
+	
+	
 	@NotNull
 	private String userId;						//작성자ID
 	

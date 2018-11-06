@@ -14,36 +14,26 @@
 <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
 <script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-<script>
-
-
-function callAdd11(){
-	alert("!!!!!!!!!!");
-}
-
-function callAdd(){
-	alert("222222");
-	var queryString = $("form[name=frmBoard]").serialize() ;
-	 
-    $.ajax({
-        type : 'post',
-        url : '/addUser',
-        data : queryString,
-        dataType : 'json',
-        success : function(data){
-            alert(data);
-            JSON.stringify(data);
-            console.log("AAAAAAAAAAAA");
-        },
-    });
-
-}
+<script type="text/javascript" th:inline="javascript">
 
 
 //게시판이동
 function BoardWrite(){
-
+	
+	/* <![CDATA[ */ 
+	var sId = /*[[ ${session.sessionId} ]]*/;
+	
+	if(sId == null || sId == ""){
+		if(confirm("글작성을 위해 로그인이 필요합니다. 로그인 하시겠습니까?")){
+			
+			window.location.href = "/LoginForm";
+		}
+	}else{
 		window.location.href = "/BoardWrite";
+		
+	}
+
+	/* ]]> */
 
 }
 
@@ -68,14 +58,14 @@ function BoardWrite(){
       		<td>등록일시</td>
       	</tr>
       	<tbody>
-	     <tr th:if="${boardList.size() > 0}"   th:each="board : ${boardList}">
-	         <td th:text="${board.no}" align="center">NO</td>    
+	     <tr th:if="${boardList.size() > 0}"   th:each="board, status : ${boardList}">
+	         <td th:text="${status.count}" align="center">NO</td>    
 	         <!-- <td th:text="${board.title}" align="center">제목</td> -->
 	         <td>
-	         	<a th:href="@{'/BoardDetail/' + ${board.no}}"><span th:text="${board.title}">제목</span></a>
+	         	<a th:href="@{'/BoardDetail/' + ${board.boardUuid}}"><span th:text="${board.title}">제목</span></a>
 	         </td>
-	         <td th:text="${board.writeId}" align="center">성명</td>
-	         <!-- <td th:text="${board.userInfoEntity.userName}" align="center">성명</td> -->
+	         <!-- <td th:text="${board.writeId}" align="center">성명</td> -->
+	         <td th:text="${board.userInfo.userName}" align="center">성명</td>
 	         <td th:text="${#temporals.format(board.writeDate, 'yyyy-MM-dd')}" align="center">등록일시</td>
 <!-- 	         <td th:text="${board.USE_YN}" align="center">사용여부</td> -->
 	     </tr>

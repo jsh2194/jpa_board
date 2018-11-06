@@ -12,6 +12,9 @@ public interface UserInfoEntityJpaRepository extends JpaRepository<UserInfoEntit
 	//아이디로 유저검색
 	public UserInfoEntity findByUserId(String userId);
 
+	//uuid로 유저검색
+	public UserInfoEntity findByUserUuid(String userUuid);
+
 	//로그인 정보 검색
 	public UserInfoEntity findByUserIdAndPwd(String userId, String pwd);
 	
