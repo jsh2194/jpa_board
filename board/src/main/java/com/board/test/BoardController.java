@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,14 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -143,18 +146,50 @@ public class BoardController {
 
 		//게시판 정보 조회
 		@RequestMapping("/BoardList")
-		public ModelAndView BoardList(HttpServletRequest req, HttpServletResponse resp, Model model) {
+		public ModelAndView BoardList(HttpServletRequest req, HttpServletResponse resp, Model model, Sort sort
+								,@PageableDefault(size = 10)  Pageable pageable) {
+
+			ModelAndView mv = new ModelAndView();
+			
+//			sort = sort.and(new Sort(Sort.Direction.DESC, "writeDate"));
+//			List<BoardEntity> boardList =  boardEntityJpaRepository.findAll(sort);  //전체조회에 sort 조건 넣기
+		
+//			List<BoardEntity> boardList =  boardEntityJpaRepository.findByUseYnOrderByWriteDateDesc("Y");	//삭제안된내용만조회
+			
+			
+			Page<BoardEntity> page =  boardEntityJpaRepository.findByUseYnOrderByWriteDateDesc("Y", pageable);	//삭제안된내용만조회
+
+			List<BoardEntity> boardList = page.getContent();
 
 			
-			ModelAndView mv = new ModelAndView();
-					
-			List<BoardEntity> boardList =  boardEntityJpaRepository.findAll();
-
-
+			System.out.println("page : " + page.toString());
+			System.out.println("boardList : " + boardList.toString());
+			
+			
+			List<Sort.Order> sortOrders = page.getSort().stream().collect(Collectors.toList());
+		      if (sortOrders.size() > 0) {
+		          Sort.Order order = sortOrders.get(0);
+//		          model.addAttribute("sortProperty", order.getProperty());
+//		          model.addAttribute("sortDesc", order.getDirection() == Sort.Direction.DESC);
+		          mv.addObject("sortProperty", order.getProperty());
+		          mv.addObject("sortDesc", order.getDirection() == Sort.Direction.DESC);
+		      }
+//		      model.addAttribute("page", page);
+		      mv.addObject("page", page);
+		      
+		      System.out.println("AAAAAAAAAAA  : " + mv.toString());
+			
+			
+			
 			mv.addObject("boardList", boardList);
 			mv.setViewName("BoardList");
 			
-			System.out.println("%%%%%%%%%%%%%%%%%%%%" + boardList.size());
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%" + boardList.size());
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%List " + resultPage.getSize());
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%List " + resultPage.getTotalElements());
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%List " + resultPage.toString());
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%List " + resultPage.getTotalPages());
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%List " + resultPage.getPageable());
 			
 			return  mv;
 
@@ -250,6 +285,13 @@ public class BoardController {
 			
 			System.out.println("AAAAA 111111");
 			
+			BoardEntity viewCntInfo =  boardEntityJpaRepository.findByBoardUuid(boardUuid);
+			
+			viewCntInfo.setViewCnt(viewCntInfo.getViewCnt() + 1);
+			
+			boardEntityJpaRepository.save(viewCntInfo);			//viewCnt update
+			
+			
 			ModelAndView mv = new ModelAndView();
 			
 			System.out.println(boardUuid);
@@ -305,8 +347,8 @@ public class BoardController {
 				userInfo.setUserUuid(String.valueOf(req.getSession().getAttribute("sessionId")));
 				boardInfo.setUserInfo(userInfo);
 				
-				boardInfo.setUpdateDate(date);
-				boardInfo.setUseYn("Y");
+//				boardInfo.setUpdateDate(date);
+//				boardInfo.setUseYn("Y");
 				
 				
 				BoardEntity boardInfoData = boardEntityJpaRepository.save(boardInfo);
@@ -316,6 +358,58 @@ public class BoardController {
 				//			mv.addObject("result", "Y");
 				mv.put("result", "Y");
 				mv.put("boardUuid", boardInfoData.getBoardUuid());
+				
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+				mv.put("result", "N");
+			}
+			
+			return mv;
+			
+			
+		}
+		
+		
+		//글삭제
+		@RequestMapping("/saveDelete")
+//		@ResponseBody 
+		public Map<String, Object> saveDelete(HttpServletRequest req, HttpServletResponse resp,
+				BoardEntity boardParam, UserInfoEntity  userInfoParam, Map<String, Object> paramMap) {
+			
+			System.out.println("saveDelete start");
+			
+			BoardEntity orgBoardInfo =  boardEntityJpaRepository.findByBoardUuid(boardParam.getBoardUuid());
+			
+			
+			Map<String, Object> mv = new HashMap<String, Object>(); 
+			
+			BoardEntity boardInfo = new BoardEntity();
+			UserInfoEntity userInfo = new UserInfoEntity();
+			
+			
+			try {
+				
+				boardInfo.setBoardUuid(boardParam.getBoardUuid());
+				
+				boardInfo.setTitle(String.valueOf(orgBoardInfo.getTitle()));
+				
+				boardInfo.setContents(String.valueOf(orgBoardInfo.getContents()));
+				
+				userInfo.setUserUuid(String.valueOf(req.getSession().getAttribute("sessionId")));
+				boardInfo.setUserInfo(userInfo);
+				
+				boardInfo.setViewCnt(orgBoardInfo.getViewCnt());
+				
+				boardInfo.setUseYn("N");
+				
+				
+				BoardEntity boardInfoData = boardEntityJpaRepository.save(boardInfo);
+				
+				System.out.println("@@@@@@@@  DELETE : " + boardInfo.toString());
+				
+				//			mv.addObject("result", "Y");
+				mv.put("result", "Y");
 				
 				
 			}catch (Exception e) {

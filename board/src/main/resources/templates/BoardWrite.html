@@ -21,7 +21,6 @@ function saveWrite(){
 	
 	/* <![CDATA[ */
 		
-		alert("1111");
 	var queryString = $("form[name=frmBoard]").serialize() ;
 	 
     $.ajax({
@@ -90,6 +89,47 @@ function saveUpdate(){
 	
 }
 
+
+//삭제
+function saveDelete(){
+	/* <![CDATA[ */ 
+
+	var boardUuid = /*[[ ${boardInfo?.boardUuid} ]]*/
+	var queryString = $("form[name=frmBoard]").serialize() ;
+	
+	queryString += '&boardUuid=' + boardUuid;
+	
+    $.ajax({
+        type : 'post',
+        url : '/saveDelete',
+        data : queryString,
+        dataType : 'json',
+        success : function(data){
+            JSON.stringify(data);
+            
+            if(data.result == 'Y'){
+            	alert("삭제 완료");
+
+            	window.location.href = "/BoardList";
+
+            }else if(data.result == 'N'){
+            	alert("삭제 실패");
+            	
+            }
+        },
+    });
+
+	/* ]]> */
+	
+}
+
+//게시판이동
+function BoardList(){
+
+		window.location.href = "/BoardList";
+
+}
+
 </script>
 
 </head>
@@ -101,7 +141,8 @@ function saveUpdate(){
 		
 		<table class="">
       	<tr>
-      		<td>게시판글쓰기</td>
+      		<td th:if="${detailView.equals('Y')}">게시판글쓰기</td>
+      		<td th:unless="${detailView.equals('Y')}">상세보기</td>
       	</tr>
       </table>
 		
@@ -132,7 +173,10 @@ function saveUpdate(){
       <input th:if="${boardInfo?.userInfo?.userUuid?.equals(session?.sessionId)}" type="button" id="btn1" name="btn1" value="수정" onclick="javascript:saveUpdate()">
       <input th:if="${boardInfo?.userInfo?.userUuid?.equals(session?.sessionId)}" type="button" id="btn1" name="btn1" value="삭제" onclick="javascript:saveDelete()">
       
-      <input th:unless="${session?.sessionId.equals('')}" type="button" id="btn" name="btn" value="글작성" onclick="javascript:saveWrite()">
+      <!-- <input th:unless="${session?.sessionId.equals('')}" type="button" id="btn" name="btn" value="글작성" onclick="javascript:saveWrite()"> -->
+      <input th:if="${session.sessionId}" type="button" id="btn" name="btn" value="글작성" onclick="javascript:saveWrite()">
+      
+      <input type="button" id="btn" name="btn" value="목록" onclick="javascript:BoardList()">
       
       <!-- <input type="button" id="btn" name="btn" value="글작성" onclick="javascript:BoardWrite()"> -->
       

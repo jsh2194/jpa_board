@@ -17,6 +17,41 @@
 <script type="text/javascript" th:inline="javascript">
 
 
+	//thymeleaf to javascript variables
+	/*<![CDATA[*/
+	var sortProperty = /*[[${sortProperty}]]*/ null;
+	var sortDesc = /*[[${sortDesc}]]*/ null;
+	var currentPage = /*[[${page.number}]]*/ 0;
+	var pageSize =/*[[${page.size}]]*/ 0;
+	/*]]>*/
+
+	$(document).ready(function(){
+	 //show up/down arrows
+	 $("table#emp-table thead th").each(function(){
+	    var head = $(this);
+	    if(head.attr('data-sort-prop')==sortProperty){
+	        head.append(sortDesc?'?':'?');
+	    }
+	    });
+
+	 //set click action, reload page on clicking with all query params
+	 $("table#emp-table thead th").click(function() {
+	  var headerSortPropName = $(this).attr("data-sort-prop");
+	  if(headerSortPropName==sortProperty){
+	      window.location.href = window.location.pathname+
+	      //'?page='+currentPage+'&size='+pageSize+'&sort='+ headerSortPropName+','+(sortDesc?'asc':'desc');
+	      '?page='+currentPage+'&size='+pageSize;
+	  }else{
+	       window.location.href = window.location.pathname+
+	      //'?page='+currentPage+'&size='+pageSize+'&sort='+ headerSortPropName+',asc';
+	      '?page='+currentPage+'&size='+pageSize;
+	  }
+	  });
+	});
+
+
+
+
 //게시판이동
 function BoardWrite(){
 	
@@ -38,6 +73,19 @@ function BoardWrite(){
 }
 
 </script>
+<style>
+    table{width:70%;}
+    table td, table th { border: 1px solid grey;}
+    table th { user-select: none; background: #eee;}
+    table tr th:first-child{width:150px;}
+    table tr th:nth-child(2){width:100px;}
+    table tr th:nth-child(3){width:150px;}
+    table tr th:nth-child(4){width:50px;}
+    .pagination-div{user-select: none;}
+    .pagination-div span{border-radius:3px;border:1px solid #999;
+        padding:5px;margin:10px 0px 0px 10px;display:inline-block}
+    span.selected{background:#ccf;}
+ </style>
 
 </head>
 <body>
@@ -49,32 +97,77 @@ function BoardWrite(){
       		<td>게시판</td>
       	</tr>
       </table>
-		
+	<table id="emp-table">
+	    <thead>
+	    <tr>
+	        <th data-sort-prop="no">번호</th>
+	        <th data-sort-prop="title">제목</th>
+	        <th data-sort-prop="userName">성명</th>
+	        <th data-sort-prop="writeDate">등록일자</th>
+	        <th data-sort-prop="viewCnt">조회수</th>
+	    </tr>
+	    </thead>
+	    
+	    <tr th:if="${boardList.size() > 0}"   th:each="board, status : ${boardList}">
+	        <!-- <td th:text="${board.title}"></td> -->
+	        <td th:text="${page.number * 10  + status.count}">No</td>
+	        <td>
+	        	<a th:href="@{'/BoardDetail/' + ${board.boardUuid}}"><span th:text="${board.title}">제목</span></a>
+	        </td>
+	        <td th:text="${board.userInfo.userName}"></td>
+	        <td th:text="${#temporals.format(board.writeDate, 'yyyy-MM-dd')}" align="center">등록일자</td>
+	        <td th:text="${board.viewCnt}">0</td>
+	    </tr>
+	    <tr th:unless="${boardList.size() > 0}"><!-- if반대  unless -->
+	     	<td colspan="4"> 작성된 글이 없습니다.</td>
+	    </tr>
+	</table>	
+	<!-- using th:with to declare a local variable for sorting query param -->
+	<div class="pagination-div" >
+	    <span th:if="${page.hasPrevious()}">
+	        <a th:href="@{/BoardList(page=${page.number-1},size=${page.size})}">이전</a>
+	    </span>
+	    <th:block th:each="i: ${#numbers.sequence(0, page.totalPages - 1)}">
+	        <span th:if="${page.number == i}" class="selected">[[${i}+1]]</span>
+	        <span th:unless="${page.number == i}">
+	             <a th:href="@{/BoardList(page=${i},size=${page.size})}">[[${i}+1]]</a>
+	        </span>
+	    </th:block>
+	    <span th:if="${page.hasNext()}">
+	        <a th:href="@{/BoardList(page=${page.number+1},size=${page.size})}">다음</a>
+	    </span>
+	</div>	
+	
+<!-- 		
       <table border="1px">
       	<tr>
       		<td>순번</td>
       		<td>제목</td>
       		<td>작성자</td>
       		<td>등록일시</td>
+      		<td>조회수</td>
       	</tr>
       	<tbody>
 	     <tr th:if="${boardList.size() > 0}"   th:each="board, status : ${boardList}">
 	         <td th:text="${status.count}" align="center">NO</td>    
-	         <!-- <td th:text="${board.title}" align="center">제목</td> -->
+	         <td th:text="${board.title}" align="center">제목</td>
 	         <td>
 	         	<a th:href="@{'/BoardDetail/' + ${board.boardUuid}}"><span th:text="${board.title}">제목</span></a>
 	         </td>
-	         <!-- <td th:text="${board.writeId}" align="center">성명</td> -->
+	         <td th:text="${board.writeId}" align="center">성명</td>
 	         <td th:text="${board.userInfo.userName}" align="center">성명</td>
 	         <td th:text="${#temporals.format(board.writeDate, 'yyyy-MM-dd')}" align="center">등록일시</td>
-<!-- 	         <td th:text="${board.USE_YN}" align="center">사용여부</td> -->
+	         <td th:text="${board.USE_YN}" align="center">사용여부</td>
+	         <td th:text="${board.viewCnt}" align="center">0</td>    
 	     </tr>
-	     <tr th:unless="${boardList.size() > 0}"><!-- if반대  unless -->
-	     	<td colspan="4"> 작성된 글이 없습니다.</td>
+	     <tr th:unless="${boardList.size() > 0}">if반대  unless
+	     	<td colspan="5"> 작성된 글이 없습니다.</td>
 	     </tr>
 	     
 	     </tbody>
       </table>
+      
+       -->
       <br/>
       <input type="button" id="btn" name="btn" value="글작성" onclick="javascript:BoardWrite()">
       세션아이디 : <p th:text="${session.sessionId}">아이디</p>
